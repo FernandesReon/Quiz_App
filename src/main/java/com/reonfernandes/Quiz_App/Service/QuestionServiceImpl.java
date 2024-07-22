@@ -15,12 +15,16 @@ import java.util.Optional;
 @Service
 public class QuestionServiceImpl implements QuestionService {
 
-    @Autowired
-    QuestionRepository repository;
+//    @Autowired
+    private final QuestionRepository repository;
+
+    public QuestionServiceImpl(QuestionRepository repository) {
+        this.repository = repository;
+    }
 
     /*
-    Basic CRUD operation
-     */
+        Basic CRUD operation
+         */
     @Override
     public ResponseEntity<String> addQuestion(Questions questions) {
         repository.save(questions);
@@ -129,7 +133,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public ResponseEntity<List<Questions>> fetchByDifficultyLevel(String level) {
-        List<Questions> questions = repository.findBydifficultyLevel(level);
+        List<Questions> questions = repository.findByDifficultyLevel(level);
         if (questions.isEmpty()){
             throw new QuestionNotFoundException("No such "+ level+ " difficulty level found: ");
         }

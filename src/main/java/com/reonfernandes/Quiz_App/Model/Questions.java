@@ -7,7 +7,7 @@ import org.hibernate.validator.constraints.Length;
 
 @Data
 @Entity
-@Table(name = "Quiz_App")
+@Table(name = "Questions")
 public class Questions {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
