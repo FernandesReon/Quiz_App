@@ -27,7 +27,7 @@ public class QuizController{
     @PostMapping("/createQuiz")
     public ResponseEntity<String> createQuiz(@RequestParam String category, @RequestParam String level,
                                              @RequestParam int noOfQuestions,
-                                             @RequestParam String quizTitle){
+                                             @RequestParam String quizTitle) throws Exception {
 
         // Request Param is basically used to take user input like their choice of type they want to play.
         return quizService.createQuiz(category, level, noOfQuestions, quizTitle);
@@ -43,6 +43,14 @@ public class QuizController{
         return quizService.getQuizQuestion(id);
     }
 
+    /*
+     1. Using path variable to submit response for particular quiz,
+     Will be submitting the response for multiple questions that's
+     the reason for using List as parameter.
+
+     2. Response class create to indicate what type of response will
+     submit.
+     */
     @PostMapping("/submit/{id}")
     public ResponseEntity<Integer> submitQuiz(@PathVariable Integer id,
                                               @RequestBody List<Response> responses){

@@ -1,5 +1,7 @@
 package com.reonfernandes.Quiz_App.Service;
 
+import com.reonfernandes.Quiz_App.Exceptions.CategoryNotFoundException;
+import com.reonfernandes.Quiz_App.Exceptions.IdNotFoundException;
 import com.reonfernandes.Quiz_App.Model.QuestionWrapper;
 import com.reonfernandes.Quiz_App.Model.Questions;
 import com.reonfernandes.Quiz_App.Model.Quiz;
@@ -30,16 +32,20 @@ public class QuizServiceImpl implements QuizService{
          Questions will come from Questions repository, as we don't have pre-defined method to do so
          we are going to create a method and write native SQL query in question repository.
          */
-
         List<Questions> questions =
                 questionRepository.findRandomQuestionsViaCategoryAndLevel(category, level, noOfQuestions);
 
-        quiz.setQuizTitle(quizTitle);
-        quiz.setQuestions(questions);
+        if (questions.isEmpty()){
+            throw new CategoryNotFoundException("Category: "+ category+" not found.");
+        }
+        else {
+            quiz.setQuizTitle(quizTitle);
+            quiz.setQuestions(questions);
 
-        // saving the entity quiz.
-        quizRepository.save(quiz);
-        return new ResponseEntity<>("Success", HttpStatus.CREATED);
+            // saving the entity quiz.
+            quizRepository.save(quiz);
+            return new ResponseEntity<>("Success", HttpStatus.CREATED);
+        }
     }
 
     @Override
@@ -48,27 +54,32 @@ public class QuizServiceImpl implements QuizService{
         // Using Optional because if the quiz id that I am trying to fetch is not there in DB,it can give error.
         Optional<Quiz> quiz = quizRepository.findById(id);
 
-        // Now we have fetched the questions from Database using quiz reference.
-        List<Questions> questionsFromDB = quiz.get().getQuestions();
-
-        /*
+        if (quiz.isPresent()){
+            List<Questions> questionsFromDB = quiz.get().getQuestions();
+            /*
         Now we created new empty arraylist so that we can manually add the desired fields for question wrapper.
         We will use for each loop to get data from DB and pass as an argument to QuestionWrapper constructor.
          */
-        List<QuestionWrapper> questionsForUsers = new ArrayList<>();
 
-        for (Questions questions : questionsFromDB){
-            QuestionWrapper questionWrapper = new QuestionWrapper(questions.getId(), questions.getQuestionTitle(),
-                    questions.getOption1(), questions.getOption2(), questions.getOption3(), questions.getOption4());
-            questionsForUsers.add(questionWrapper);
+            List<QuestionWrapper> questionsForUsers = new ArrayList<>();
+
+            for (Questions questions : questionsFromDB){
+                QuestionWrapper questionWrapper = new QuestionWrapper(questions.getId(), questions.getQuestionTitle(),
+                        questions.getOption1(), questions.getOption2(), questions.getOption3(), questions.getOption4());
+                questionsForUsers.add(questionWrapper);
+            }
+            return new ResponseEntity<>(questionsForUsers, HttpStatus.OK);
         }
-        return new ResponseEntity<>(questionsForUsers, HttpStatus.OK);
+        else{
+            throw new IdNotFoundException("Id: "+id+" not found");
+        }
+
     }
 
     @Override
     public ResponseEntity<Integer> calculateScore(Integer id, List<Response> responses) {
-        Quiz quiz = quizRepository.findById(id).get();
-        List<Questions> questions = quiz.getQuestions();
+        Optional<Quiz> quiz = quizRepository.findById(id);
+        List<Questions> questions = quiz.get().getQuestions();
         int correctAnswers = 0;
         int index = 0;
         for (Response response : responses){

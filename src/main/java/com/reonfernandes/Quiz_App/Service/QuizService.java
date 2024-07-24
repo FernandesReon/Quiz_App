@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface QuizService {
-    ResponseEntity<String> createQuiz(String category, String level, int noOfQuestions, String quizTitle);
+    ResponseEntity<String> createQuiz(String category, String level, int noOfQuestions, String quizTitle) throws Exception;
 
     ResponseEntity<List<QuestionWrapper>> getQuizQuestion(Integer id);
 

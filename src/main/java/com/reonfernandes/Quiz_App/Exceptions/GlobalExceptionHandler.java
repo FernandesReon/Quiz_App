@@ -12,4 +12,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> QuestionNotFoundException(QuestionNotFoundException exception){
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<String> CategoryNotFoundException(CategoryNotFoundException categoryException){
+        return new ResponseEntity<>(categoryException.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(IdNotFoundException.class)
+    public ResponseEntity<String> IdNotFoundException(IdNotFoundException idException){
+        return new ResponseEntity<>(idException.getMessage(), HttpStatus.NOT_FOUND);
+    }
 }
